@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 from envparse import Env
 from downloader.RioClientDownloader import RioClientDownloader
 from downloader.RioZipTuner import RioZipTuner
@@ -14,15 +14,30 @@ rio_downloader = RioClientDownloader(data_dir=env.str('DATA_DIR'))
 rio_tuner = RioZipTuner(data_dir=env.str('DATA_DIR'))
 
 
+def get_model():
+    model = []
+    return model
+
+
 @app.route('/')
 def root():
-    return render_template('index.html')
+    return render_template('index.html', model=get_model())
 
 
 @app.route('/download_latest')
 def download_latest():
     rio_downloader.download_latest()
-    return render_template('index.html')
+    return render_template('index.html', model=get_model())
+
+
+@app.route('/raider_io_tuned')
+def download():
+    return send_file('data/processed.zip', attachment_filename='raider_io_tuned.zip')
+
+
+@app.route('/raider_io_raw')
+def download_raw():
+    return send_file('data/latest.zip', attachment_filename='raider_io_raw.zip')
 
 
 if __name__ == '__main__':
