@@ -1,6 +1,6 @@
 
 from envparse import Env
-from downloader.RioClientDownloader import RioClientDownloader
+from downloader.RioZipTuner import RioZipTuner
 
 env = Env(
     HOST=dict(cast=str,  default='0.0.0.0'),
@@ -11,4 +11,4 @@ env.read_envfile()
 
 
 if __name__ == '__main__':
-    print(RioClientDownloader(data_dir=env.str('DATA_DIR')).download_latest())
+    print(RioZipTuner(data_dir=env.str('DATA_DIR')).tune())

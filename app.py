@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from envparse import Env
 from downloader.RioClientDownloader import RioClientDownloader
+from downloader.RioZipTuner import RioZipTuner
 
 app = Flask(__name__)
 env = Env(
@@ -10,6 +11,7 @@ env = Env(
 )
 env.read_envfile()
 rio_downloader = RioClientDownloader(data_dir=env.str('DATA_DIR'))
+rio_tuner = RioZipTuner(data_dir=env.str('DATA_DIR'))
 
 
 @app.route('/')
