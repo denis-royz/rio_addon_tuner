@@ -15,10 +15,13 @@ class RioClientDownloader:
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
 
-    def download_latest(self):
+    def check_have_latest_version(self):
         downloaded_version_timestamp = self.check_downloaded_version()
         curse_version_timestamp = self.check_curse_version()
-        if curse_version_timestamp > downloaded_version_timestamp:
+        return curse_version_timestamp > downloaded_version_timestamp
+
+    def download_latest(self):
+        if self.check_have_latest_version():
             print('Downloading new version from curse')
             file_path = self.data_dir + "/" + self.dest_file_name
             urllib.request.urlretrieve(self.url, file_path)
