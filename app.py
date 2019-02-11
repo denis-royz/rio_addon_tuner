@@ -5,6 +5,7 @@ from downloader.RioZipTuner import RioZipTuner
 from downloader.LoadProtection import LoadProtection
 from datetime import datetime
 
+
 app = Flask(__name__)
 env = Env(
     HOST=dict(cast=str,  default='0.0.0.0'),
@@ -14,7 +15,7 @@ env = Env(
 env.read_envfile()
 rio_downloader = RioClientDownloader(data_dir=env.str('DATA_DIR'))
 rio_tuner = RioZipTuner(data_dir=env.str('DATA_DIR'))
-load_protection = LoadProtection()
+load_protection = LoadProtection(data_dir=env.str('DATA_DIR'))
 
 
 def format_date(date_long, message_in_case_date_is_zero):
