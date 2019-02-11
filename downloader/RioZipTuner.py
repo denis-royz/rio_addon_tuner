@@ -31,14 +31,14 @@ class RioZipTuner:
     def check_have_latest_version(self):
         source_version = self.check_source_version()
         dest_version = self.check_dest_version()
-        return dest_version > source_version
+        return dest_version is not 0.0 or dest_version > source_version
 
     def tune(self):
         if self.check_source_version is 0.0:
             print("input file dies not exist")
             return
         if not self.check_have_latest_version():
-            print('Latest version is already tunned')
+            print('Latest version is already tuned')
             return
         source_file_path = self.data_dir + "/" + self.source_file_name
         dest_file_path = self.data_dir + "/" + self.dest_file_name
