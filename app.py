@@ -3,6 +3,7 @@ from envparse import Env
 from downloader.RioClientDownloader import RioClientDownloader
 from downloader.RioZipTuner import RioZipTuner
 from downloader.LoadProtection import LoadProtection
+from downloader.FileConfig import FileConfig
 from datetime import datetime
 
 
@@ -10,12 +11,14 @@ app = Flask(__name__)
 env = Env(
     HOST=dict(cast=str,  default='0.0.0.0'),
     HTTP_PORT=dict(cast=int,  default='5000'),
-    DATA_DIR=dict(cast=int,  default='../data')
+    DATA_DIR=dict(cast=str,  default='../data'),
+    DOWNLOADS_PER_DAY=dict(cast=int,  default='10')
 )
 env.read_envfile()
-rio_downloader = RioClientDownloader(data_dir=env.str('DATA_DIR'))
-rio_tuner = RioZipTuner(data_dir=env.str('DATA_DIR'))
-load_protection = LoadProtection(data_dir=env.str('DATA_DIR'))
+file_config = FileConfig(data_dir=env.str('DATA_DIR'))
+rio_downloader = RioClientDownloader(file_config)
+rio_tuner = RioZipTuner(file_config)
+load_protection = LoadProtection(file_config, max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
 
 
 def format_date(date_long, message_in_case_date_is_zero):

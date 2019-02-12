@@ -4,15 +4,13 @@ import datetime
 
 class LoadProtection:
 
-    max_attempts_per_day = 10
-
     def get_con(self):
-        return sqlite3.connect(self.data_dir+'/'+'load_protection.db')
+        return sqlite3.connect(self.file_config.get_db_file_path())
 
-    def __init__(self, data_dir):
-        self.data_dir = data_dir
+    def __init__(self, file_config, max_downloads_per_day):
+        self.file_config = file_config
+        self.max_downloads_per_day =int( max_downloads_per_day)
         with self.get_con() as con:
-            con = sqlite3.connect(data_dir+'/'+'load_protection.db')
             c = con.cursor()
             sql = 'create table if not exists ' + 'ATTEMPTS' \
                   + ' (id INTEGER PRIMARY KEY AUTOINCREMENT, event_timestamp timestamp)'
@@ -37,7 +35,7 @@ class LoadProtection:
             sql = 'select count(distinct(id)) from ' + 'ATTEMPTS' + ' where event_timestamp >= ?'
             c.execute(sql, [from_date])
             result = c.fetchone()
-            return max(0, self.max_attempts_per_day - result[0])
+            return max(0, self.max_downloads_per_day - result[0])
 
     def reset_license(self):
         with self.get_con() as con:

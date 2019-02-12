@@ -1,5 +1,4 @@
 import urllib.request
-import os
 from bs4 import BeautifulSoup
 
 
@@ -9,8 +8,8 @@ class RioClientDownloader:
     curseforge = 'https://wow.curseforge.com/projects/raiderio?gameCategorySlug=addons&projectID=279257'
     dest_file_name = 'latest.zip'
 
-    def __init__(self, data_dir):
-        self.data_dir = data_dir
+    def __init__(self, file_config):
+        self.file_config = file_config
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
@@ -23,7 +22,7 @@ class RioClientDownloader:
     def download_latest(self):
         if self.check_have_latest_version():
             print('Downloading new version from curse')
-            file_path = self.data_dir + "/" + self.dest_file_name
+            file_path = self.file_config.get_raw_file_path()
             urllib.request.urlretrieve(self.url, file_path)
             return True
         else:
@@ -41,10 +40,4 @@ class RioClientDownloader:
             return float(addbr.attrs['data-epoch'])
 
     def check_downloaded_version(self):
-        file_path = self.data_dir + "/" + self.dest_file_name
-        exists = os.path.exists(file_path)
-        if exists:
-            stat = os.stat(file_path)
-            return float(stat.st_ctime)
-        else:
-            return float(0)
+        return self.file_config.file_age(self.file_config.get_raw_file_path())
