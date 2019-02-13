@@ -3,6 +3,7 @@ from envparse import Env
 from downloader.RioClientDownloader import RioClientDownloader
 from downloader.RioZipTuner import RioZipTuner
 from downloader.LoadProtection import LoadProtection
+from downloader.PersonalRecommendation import PersonalRecommendation
 from downloader.FileConfig import FileConfig
 from datetime import datetime
 
@@ -19,6 +20,7 @@ file_config = FileConfig(data_dir=env.str('DATA_DIR'))
 rio_downloader = RioClientDownloader(file_config)
 rio_tuner = RioZipTuner(file_config)
 load_protection = LoadProtection(file_config, max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
+personalRecommendation = PersonalRecommendation()
 
 
 def format_date(date_long, message_in_case_date_is_zero):
@@ -35,7 +37,8 @@ def get_model():
     model = dict(
         latest_tuned_version_date=format_date(tuned_version_unix_time, 'No tuned zip presented'),
         latest_raw_version_date=format_date(raw_version_unix_time, 'No RIO zip presented'),
-        allowed_downloads=allowed_downloads
+        allowed_downloads=allowed_downloads,
+        wow_path=personalRecommendation.get_path_to_wow()
     )
     return model
 
