@@ -1,4 +1,6 @@
 import zipfile
+import logging
+logger = logging.getLogger()
 
 
 class RioZipTuner:
@@ -19,10 +21,10 @@ class RioZipTuner:
 
     def tune(self):
         if self.check_source_version is 0.0:
-            print("input file does not exist")
+            logger.info("input file does not exist")
             return
         if not self.check_have_latest_version():
-            print('Latest version is already tuned')
+            logger.info('Latest version is already tuned')
             return
         source_file_path = self.file_config.get_raw_file_path()
         dest_file_path = self.file_config.get_processed_file_path()

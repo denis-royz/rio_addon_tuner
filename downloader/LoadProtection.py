@@ -2,6 +2,9 @@ import sqlite3
 import datetime
 from threading import Lock
 
+import logging
+logger = logging.getLogger()
+
 
 class LoadProtection:
 
@@ -55,9 +58,9 @@ class LoadProtection:
         self.mutex.acquire()
 
         try:
-            print('lock acquired by ' + method_to_run.__name__)
+            logger.info('lock acquired by ' + method_to_run.__name__)
             result = method_to_run()
             return result
         finally:
             self.mutex.release()
-            print('lock released by ' + method_to_run.__name__)
+            logger.info('lock released by ' + method_to_run.__name__)

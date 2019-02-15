@@ -1,5 +1,7 @@
 import os
 import datetime
+import logging
+logger = logging.getLogger()
 
 
 class FileConfig:
@@ -21,7 +23,7 @@ class FileConfig:
         return self.get_file_with_name('raw_{date:%H:%M:%S}.zip'.format(date=datetime.datetime.now()))
 
     def register_raw_file_path(self, path):
-        print('Registered new RAW file: {}'.format(path))
+        logger.info('Registered new RAW file: {}'.format(path))
         self.raw_file_name = path
 
     def get_processed_file_path(self):

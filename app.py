@@ -6,6 +6,8 @@ from downloader.LoadProtection import LoadProtection
 from downloader.PersonalRecommendation import PersonalRecommendation
 from downloader.FileConfig import FileConfig
 from datetime import datetime
+import logging
+import sys
 
 
 app = Flask(__name__)
@@ -22,6 +24,15 @@ rio_tuner = RioZipTuner(file_config)
 load_protection = LoadProtection(file_config, max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
 load_protection.setup_database_schema()
 personalRecommendation = PersonalRecommendation()
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s-%(name)s-%(levelname)s-%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 
 def format_date(date_long, message_in_case_date_is_zero):

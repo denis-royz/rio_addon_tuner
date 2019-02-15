@@ -2,6 +2,9 @@ import urllib.request
 from bs4 import BeautifulSoup
 from threading import Lock
 
+import logging
+logger = logging.getLogger()
+
 
 class RioClientDownloader:
 
@@ -27,12 +30,12 @@ class RioClientDownloader:
         with lock:
             if self.check_have_latest_version():
                 file_path = self.file_config.get_new_raw_file_path()
-                print('Downloading new version from curse')
+                logger.info('Downloading new version from curse')
                 urllib.request.urlretrieve(self.url, file_path)
                 self.file_config.register_raw_file_path(file_path)
                 return True
             else:
-                print('Already have latest version')
+                logger.info('Already have latest version')
                 return False
 
     def check_curse_version(self):
