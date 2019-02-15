@@ -3,9 +3,6 @@ import zipfile
 
 class RioZipTuner:
 
-    dest_file_name = 'processed.zip'
-    source_file_name = 'latest.zip'
-
     def __init__(self, file_config):
         self.file_config = file_config
 
@@ -22,7 +19,7 @@ class RioZipTuner:
 
     def tune(self):
         if self.check_source_version is 0.0:
-            print("input file dies not exist")
+            print("input file does not exist")
             return
         if not self.check_have_latest_version():
             print('Latest version is already tuned')
@@ -34,7 +31,6 @@ class RioZipTuner:
         for item in zin.infolist():
             buffer = zin.read(item.filename)
             allowed_to_write_file = True
-            # "EU" in item.filename or "RaiderIO/" in item.filename
             if '_kr_' in item.filename.lower():
                 allowed_to_write_file = False
             if '_us_' in item.filename.lower():

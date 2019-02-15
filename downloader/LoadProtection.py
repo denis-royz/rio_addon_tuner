@@ -53,6 +53,7 @@ class LoadProtection:
 
     def protected_call(self, method_to_run):
         self.mutex.acquire()
+
         try:
             print('lock acquired by ' + method_to_run.__name__)
             result = method_to_run()

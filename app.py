@@ -52,13 +52,13 @@ def root():
 
 @app.route('/download_latest')
 def download_latest():
-    load_protection.protected_call(rio_downloader.download_latest)
+    rio_downloader.download_latest()
     return render_template('index.html', model=get_model())
 
 
 @app.route('/raider_io_tuned')
 def download():
-    load_protection.protected_call(rio_downloader.download_latest)
+    rio_downloader.download_latest()
     load_protection.protected_call(rio_tuner.tune)
     if load_protection.is_allowed_to_handle():
         load_protection.register_new_usage()
@@ -69,10 +69,10 @@ def download():
 
 @app.route('/raider_io_raw')
 def download_raw():
-    load_protection.protected_call(rio_downloader.download_latest)
+    rio_downloader.download_latest()
     if load_protection.is_allowed_to_handle():
         load_protection.register_new_usage()
-        return send_file('data/latest.zip', attachment_filename='raider_io_raw.zip')
+        return send_file(file_config.get_raw_file_path(), attachment_filename='raider_io_raw.zip')
     else:
         raise Exception
 
