@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, abort
 from envparse import Env
 from downloader.RioClientDownloader import RioClientDownloader
 from downloader.RioZipTuner import RioZipTuner
@@ -74,9 +74,9 @@ def download():
     rio_tuner.tune()
     if load_protection.is_allowed_to_handle():
         load_protection.register_new_usage()
-        return send_file(patched_file_accessor.get_file_path())
+        return send_file(patched_file_accessor.get_file_path(), cache_timeout=-1)
     else:
-        raise Exception
+        abort(403)
 
 
 @app.route('/raider_io_raw')
@@ -84,9 +84,15 @@ def download_raw():
     rio_downloader.download_latest()
     if load_protection.is_allowed_to_handle():
         load_protection.register_new_usage()
-        return send_file(raw_file_accessor.get_file_path())
+        return send_file(raw_file_accessor.get_file_path(), cache_timeout=-1)
     else:
-        raise Exception
+        abort(403)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
 
 
 if __name__ == '__main__':
