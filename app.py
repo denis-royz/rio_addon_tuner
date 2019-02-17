@@ -4,7 +4,7 @@ from downloader.RioClientDownloader import RioClientDownloader
 from downloader.RioZipTuner import RioZipTuner
 from downloader.LoadProtection import LoadProtection
 from downloader.PersonalRecommendation import PersonalRecommendation
-from downloader.FileConfig import FileConfig
+from downloader.FileAccessor import FileAccessor
 from datetime import datetime
 import logging
 import sys
@@ -18,10 +18,11 @@ env = Env(
     DOWNLOADS_PER_DAY=dict(cast=int,  default='10')
 )
 env.read_envfile()
-file_config = FileConfig(data_dir=env.str('DATA_DIR'))
-rio_downloader = RioClientDownloader(file_config)
-rio_tuner = RioZipTuner(file_config)
-load_protection = LoadProtection(file_config, max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
+raw_file_accessor = FileAccessor(env.str('DATA_DIR'), 'raw', 'zip')
+patched_file_accessor = FileAccessor(env.str('DATA_DIR'), 'patched', 'zip')
+rio_downloader = RioClientDownloader(raw_file_accessor)
+rio_tuner = RioZipTuner(raw_file_accessor, patched_file_accessor)
+load_protection = LoadProtection(env.str('DATA_DIR'), max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
 load_protection.setup_database_schema()
 personalRecommendation = PersonalRecommendation()
 
@@ -43,8 +44,8 @@ def format_date(date_long, message_in_case_date_is_zero):
 
 
 def get_model():
-    tuned_version_unix_time = load_protection.protected_call(rio_tuner.check_dest_version)
-    raw_version_unix_time = load_protection.protected_call(rio_tuner.check_source_version)
+    tuned_version_unix_time = rio_tuner.check_dest_version()
+    raw_version_unix_time = rio_tuner.check_source_version()
     allowed_downloads = load_protection.get_attempts_count()
     wow_path = personalRecommendation.get_path_to_wow()
     model = dict(
@@ -70,10 +71,10 @@ def download_latest():
 @app.route('/raider_io_tuned')
 def download():
     rio_downloader.download_latest()
-    load_protection.protected_call(rio_tuner.tune)
+    rio_tuner.tune()
     if load_protection.is_allowed_to_handle():
         load_protection.register_new_usage()
-        return send_file('data/processed.zip', attachment_filename='raider_io_tuned.zip')
+        return send_file(patched_file_accessor.get_file_path())
     else:
         raise Exception
 
@@ -83,7 +84,7 @@ def download_raw():
     rio_downloader.download_latest()
     if load_protection.is_allowed_to_handle():
         load_protection.register_new_usage()
-        return send_file(file_config.get_raw_file_path(), attachment_filename='raider_io_raw.zip')
+        return send_file(raw_file_accessor.get_file_path())
     else:
         raise Exception
 

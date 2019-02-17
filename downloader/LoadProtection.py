@@ -1,6 +1,5 @@
 import sqlite3
 import datetime
-from threading import Lock
 
 import logging
 logger = logging.getLogger()
@@ -8,13 +7,13 @@ logger = logging.getLogger()
 
 class LoadProtection:
 
+    db_file_name = 'load_protection.db'
+
     def get_con(self):
-        return sqlite3.connect(self.file_config.get_db_file_path())
+        return sqlite3.connect(self.db_path+'/'+self.db_file_name)
 
-    mutex = Lock()
-
-    def __init__(self, file_config, max_downloads_per_day):
-        self.file_config = file_config
+    def __init__(self, db_path, max_downloads_per_day):
+        self.db_path = db_path
         self.max_downloads_per_day = int(max_downloads_per_day)
 
     def setup_database_schema(self):
@@ -53,14 +52,3 @@ class LoadProtection:
             sql = 'VACUUM'
             c.execute(sql)
             con.commit()
-
-    def protected_call(self, method_to_run):
-        self.mutex.acquire()
-
-        try:
-            logger.info('lock acquired by ' + method_to_run.__name__)
-            result = method_to_run()
-            return result
-        finally:
-            self.mutex.release()
-            logger.info('lock released by ' + method_to_run.__name__)

@@ -10,9 +10,10 @@ class RioClientDownloader:
 
     url = 'https://wow.curseforge.com/projects/raiderio/files/latest'
     curseforge = 'https://wow.curseforge.com/projects/raiderio?gameCategorySlug=addons&projectID=279257'
+    lock = Lock()
 
-    def __init__(self, file_config):
-        self.file_config = file_config
+    def __init__(self, file_accessor):
+        self.file_accessor = file_accessor
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
@@ -20,23 +21,23 @@ class RioClientDownloader:
     def check_have_latest_version(self):
         downloaded_version_timestamp = self.check_downloaded_version()
         curse_version_timestamp = self.check_curse_version()
-        return curse_version_timestamp > downloaded_version_timestamp
+        return 0 < curse_version_timestamp < downloaded_version_timestamp
 
     def check_downloaded_version(self):
-        return self.file_config.file_age(self.file_config.get_raw_file_path())
+        return self.file_accessor.get_edge()
 
     def download_latest(self):
-        lock = Lock()
-        with lock:
+        with self.lock:
             if self.check_have_latest_version():
-                file_path = self.file_config.get_new_raw_file_path()
-                logger.info('Downloading new version from curse')
-                urllib.request.urlretrieve(self.url, file_path)
-                self.file_config.register_raw_file_path(file_path)
-                return True
-            else:
                 logger.info('Already have latest version')
                 return False
+            else:
+                logger.info('Downloading new version from curse')
+                file_path = self.file_accessor.get_new_file_path()
+                urllib.request.urlretrieve(self.url, file_path)
+                self.file_accessor.register_new_file_path(file_path)
+                logger.info('Downloaded new version from curse')
+                return True
 
     def check_curse_version(self):
         req = urllib.request.Request(self.curseforge)
