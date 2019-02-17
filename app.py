@@ -8,23 +8,17 @@ from downloader.FileAccessor import FileAccessor
 from datetime import datetime
 import logging
 import sys
+import os
 
 
 app = Flask(__name__)
 env = Env(
     HOST=dict(cast=str,  default='0.0.0.0'),
     HTTP_PORT=dict(cast=int,  default='5000'),
-    DATA_DIR=dict(cast=str,  default='../data'),
+    DATA_DIR=dict(cast=str,  default='data'),
     DOWNLOADS_PER_DAY=dict(cast=int,  default='10')
 )
 env.read_envfile()
-raw_file_accessor = FileAccessor(env.str('DATA_DIR'), 'raw', 'zip')
-patched_file_accessor = FileAccessor(env.str('DATA_DIR'), 'patched', 'zip')
-rio_downloader = RioClientDownloader(raw_file_accessor)
-rio_tuner = RioZipTuner(raw_file_accessor, patched_file_accessor)
-load_protection = LoadProtection(env.str('DATA_DIR'), max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
-load_protection.setup_database_schema()
-personalRecommendation = PersonalRecommendation()
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -34,6 +28,13 @@ handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s-%(name)s-%(levelname)s: %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+raw_file_accessor = FileAccessor(env.str('DATA_DIR'), 'raw', 'zip')
+patched_file_accessor = FileAccessor(env.str('DATA_DIR'), 'patched', 'zip')
+load_protection = LoadProtection(env.str('DATA_DIR'), max_downloads_per_day=env.int('DOWNLOADS_PER_DAY'))
+rio_downloader = RioClientDownloader(raw_file_accessor)
+rio_tuner = RioZipTuner(raw_file_accessor, patched_file_accessor)
+personalRecommendation = PersonalRecommendation()
 
 
 def format_date(date_long, message_in_case_date_is_zero):
@@ -99,4 +100,6 @@ if __name__ == '__main__':
     print('HOST =', env.str('HOST'))
     print('HTTP_PORT =', env.int('HTTP_PORT'))
     print('DATA_DIR =', env.str('DATA_DIR'))
+    os.mkdir(env.str('DATA_DIR'))
+    load_protection.setup_database_schema()
     app.run(host=env.str('HOST'), port=env.int('HTTP_PORT'))
