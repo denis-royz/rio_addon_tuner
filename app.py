@@ -48,12 +48,14 @@ def get_model():
     tuned_version_unix_time = rio_tuner.check_dest_version()
     raw_version_unix_time = rio_tuner.check_source_version()
     allowed_downloads = load_protection.get_attempts_count()
-    wow_path = personalRecommendation.get_path_to_wow()
+    personal_recommendation = personalRecommendation.get_personal_recommendation()
+    personal_recommendation_title = personalRecommendation.get_personal_recommendation_title()
     model = dict(
         latest_tuned_version_date=format_date(tuned_version_unix_time, 'No tuned zip presented'),
         latest_raw_version_date=format_date(raw_version_unix_time, 'No RIO zip presented'),
         allowed_downloads=allowed_downloads,
-        wow_path=wow_path
+        personal_recommendation=personal_recommendation,
+        personal_recommendation_title=personal_recommendation_title
     )
     return model
 
@@ -100,6 +102,7 @@ if __name__ == '__main__':
     print('HOST =', env.str('HOST'))
     print('HTTP_PORT =', env.int('HTTP_PORT'))
     print('DATA_DIR =', env.str('DATA_DIR'))
-    os.mkdir(env.str('DATA_DIR'))
+    if not os.path.isdir(env.str('DATA_DIR')):
+        os.mkdir(env.str('DATA_DIR'))
     load_protection.setup_database_schema()
     app.run(host=env.str('HOST'), port=env.int('HTTP_PORT'))

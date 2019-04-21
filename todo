@@ -1,9 +1,0 @@
-https://www.maptiler.com/blog/2016/08/blue-green-deployment-with-docker-and.html
-
-alias dockerx="docker -H=localhost:4243"
-
-for now
- dockerx pull nginx
-
-
- dockerx network create initiative_network

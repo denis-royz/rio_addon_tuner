@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="../static/js/util.js"></script>
 
     <link rel="icon" type="image/png" href="../static/images/favicon-196x196.png" sizes="196x196" />
     <link rel="icon" type="image/png" href="../static/images/favicon-96x96.png" sizes="96x96" />
@@ -35,16 +36,14 @@
     </div>
     <div class="row">
         <div class="col-sm">
-            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;
-">
+            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;">
                 <div class="card-body">
                     <h5 class="card-title">Get latest tuned Raider.IO client</h5>
                     <p class="card-text">{{model.latest_tuned_version_date}}</p>
                     <a href="/raider_io_tuned" class="btn btn-primary">Download</a>
                 </div>
             </div>
-            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;
-">
+            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;">
                <div class="card-body">
                  <h5 class="card-title">Get latest raw Raider.IO client</h5>
                     <p class="card-text">{{model.latest_raw_version_date}}</p>
@@ -53,18 +52,17 @@
             </div>
         </div>
         <div class="col-sm">
-            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;
-">
+            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;">
                <div class="card-body">
                  <h5 class="card-title">Allowed downloads count</h5>
                     <p class="card-text">{{model.allowed_downloads}}</p>
                </div>
             </div>
-            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;
-">
+            <div class="card" style="width: 24rem; height: 15rem; margin-bottom: 2rem; margin-top: 2rem;">
                <div class="card-body">
-                 <h5 class="card-title">Path to wow installation</h5>
-                <p class="card-text">{{model.wow_path}}</p>
+                   <h5 class="card-title">{{model.personal_recommendation_title}}</h5>
+                   <p class="card-text">{{model.personal_recommendation}}</p>
+                   <button onclick="copyTextToClipboard('{{model.personal_recommendation}}')">To clipboard</button>
                </div>
             </div>
         </div>
