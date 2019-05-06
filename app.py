@@ -9,7 +9,9 @@ from datetime import datetime
 import logging
 import sys
 import os
-
+import schedule
+import time
+import threading
 
 app = Flask(__name__)
 env = Env(
@@ -36,6 +38,9 @@ rio_downloader = RioClientDownloader(raw_file_accessor)
 rio_tuner = RioZipTuner(raw_file_accessor, patched_file_accessor)
 personalRecommendation = PersonalRecommendation()
 
+running = True
+enabled_scheduler = True
+
 
 def format_date(date_long, message_in_case_date_is_zero):
     if date_long > 0.0:
@@ -60,22 +65,29 @@ def get_model():
     return model
 
 
+def schedule_nightly_tasks():
+    logger.info("schedule_nightly_tasks")
+    schedule.every().day.at("04:30").do(scheduled).tag('daily-tasks')
+    while running and enabled_scheduler:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+def scheduled():
+    rio_downloader.download_latest()
+    rio_tuner.tune()
+
+
 @app.route('/')
 def root():
     return render_template('index.html', model=get_model())
 
 
-@app.route('/download_latest')
-def download_latest():
-    rio_downloader.download_latest()
-    return render_template('index.html', model=get_model())
-
-
 @app.route('/raider_io_tuned')
 def download():
-    rio_downloader.download_latest()
-    rio_tuner.tune()
     if load_protection.is_allowed_to_handle():
+        rio_downloader.download_latest()
+        rio_tuner.tune()
         load_protection.register_new_usage()
         return send_file(patched_file_accessor.get_file_path(), cache_timeout=-1)
     else:
@@ -84,8 +96,8 @@ def download():
 
 @app.route('/raider_io_raw')
 def download_raw():
-    rio_downloader.download_latest()
     if load_protection.is_allowed_to_handle():
+        rio_downloader.download_latest()
         load_protection.register_new_usage()
         return send_file(raw_file_accessor.get_file_path(), cache_timeout=-1)
     else:
@@ -99,10 +111,9 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    print('HOST =', env.str('HOST'))
-    print('HTTP_PORT =', env.int('HTTP_PORT'))
-    print('DATA_DIR =', env.str('DATA_DIR'))
     if not os.path.isdir(env.str('DATA_DIR')):
         os.mkdir(env.str('DATA_DIR'))
     load_protection.setup_database_schema()
+    threading.Thread(target=schedule_nightly_tasks).start()
     app.run(host=env.str('HOST'), port=env.int('HTTP_PORT'))
+    running = False

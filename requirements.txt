@@ -1,3 +1,4 @@
 flask==1.0.2
 envparse
 beautifulsoup4==4.4
+schedule==0.6.0
