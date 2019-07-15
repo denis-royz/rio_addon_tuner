@@ -7,8 +7,7 @@ logger = logging.getLogger()
 
 
 class RioClientDownloader:
-
-    url = 'https://wow.curseforge.com/projects/raiderio/files/latest'
+    url = 'https://www.curseforge.com/wow/addons/raiderio/download/2741639/file'
     curseforge = 'https://wow.curseforge.com/projects/raiderio?gameCategorySlug=addons&projectID=279257'
     lock = Lock()
 
@@ -44,7 +43,7 @@ class RioClientDownloader:
         f = urllib.request.urlopen(req)
         html = f.read().decode('utf-8')
         soup = BeautifulSoup(html, 'html.parser')
-        lrf_info_labels = soup.findAll("div", {"class": "info-label"}, text='Last Released File')
+        lrf_info_labels = soup.findAll("span", text='Updated')
         if len(lrf_info_labels) == 1:
             addbr = lrf_info_labels[0].parent.findAll("abbr")[0]
             return float(addbr.attrs['data-epoch'])
